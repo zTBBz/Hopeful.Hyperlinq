@@ -1,0 +1,7 @@
+﻿namespace Hopeful.Hyperlinq.Benchmarks;
+
+public abstract class RandomSkipBenchmarksBase : SkipBenchmarksBase
+{
+    public override void GlobalSetup()
+        => Initialize(Utils.GetRandomValues(seed, Skip + Count));
+}

@@ -1,0 +1,47 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <!-- Take a private dependency on Ben.TypeDictionary (PrivateAssets=all) Consumers of this generator will not reference it.
+         Set GeneratePathProperty=true so we can reference the binaries via the PKGBen_TypeDictionary property -->
+    <PackageReference Include="Ben.TypeDictionary" Version="0.1.4" PrivateAssets="all" GeneratePathProperty="true" />
+    
+    <!-- Take a private dependency on NetFabric.CodeAnalysis (PrivateAssets=all) Consumers of this generator will not reference it.
+         Set GeneratePathProperty=true so we can reference the binaries via the PKGNetFabric_CodeAnalysis property -->
+    <PackageReference Include="NetFabric.CodeAnalysis" Version="4.0.2" PrivateAssets="all" GeneratePathProperty="true" />
+
+    <!-- Package the generator in the analyzer directory of the nuget package -->
+    <None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+    
+    <!-- Package the Ben.TypeDictionary dependency alongside the generator assembly -->
+    <None Include="$(PKGBen_TypeDictionary)\lib\netstandard2.0\*.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+    <None Include="$(PKGNetFabric_CodeAnalysis)\lib\netstandard2.0\*.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.11.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.2">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="IsExternalInit" Version="1.0.1">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>    
+    <PackageReference Include="Nullable" Version="1.3.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+  
+  <ItemGroup>
+    <ProjectReference Include="..\Hopeful.Hyperlinq.Core\Hopeful.Hyperlinq.Core.csproj" />
+  </ItemGroup>
+</Project>
