@@ -1,19 +1,11 @@
-![GitHub last commit (main)](https://img.shields.io/github/last-commit/NetFabric/NetFabric.Hyperlinq/main.svg?style=flat-square&logo=github)
-[![Build and test](https://github.com/NetFabric/NetFabric.Hyperlinq/workflows/Build%20and%20test/badge.svg?style=flat-square)](https://github.com/NetFabric/NetFabric.Hyperlinq/actions)
-[![Coverage](https://img.shields.io/coveralls/github/NetFabric/NetFabric.Hyperlinq/main?style=flat-square&logo=coveralls)](https://coveralls.io/github/NetFabric/NetFabric.Hyperlinq)
-[![NuGet Version](https://img.shields.io/nuget/v/NetFabric.Hyperlinq.svg?style=flat-square&logo=nuget)](https://www.nuget.org/packages/NetFabric.Hyperlinq/)
-[![NuGet Downloads](https://img.shields.io/nuget/dt/NetFabric.Hyperlinq.svg?style=flat-square&logo=nuget)](https://www.nuget.org/packages/NetFabric.Hyperlinq/) 
-[![Gitter](https://img.shields.io/gitter/room/netfabric/netfabric.hyperlinq?style=flat-square&logo=gitter)](https://gitter.im/NetFabric/NetFabric.Hyperlinq)
+# Hopeful.Hyperlinq
 
-
-# NetFabric.Hyperlinq
-
-`NetFabric.Hyperlinq` contains alternative implementations of many operations found in the `System.Linq` namespace:
+`Hopeful.Hyperlinq` is a fork `NetFabric.Hyperlinq` for internally using in Hopeful.
+Contains alternative implementations of many operations found in the `System.Linq` namespace:
 
 - Uses value-types to improve performance by making method calls non-virtual and reducing GC collections by not allocating on the heap. 
 - Adds support for `Span<>`, `ReadOnlySpan<>`, `Memory<>` and `ReadOnlyMemory<>`.
 - [Nullable reference type](https://docs.microsoft.com/en-us/dotnet/csharp/nullable-references) annotations.
-- One single NuGet package support for both sync and async enumerables.
 
 This implementation **favors performance in detriment of assembly binary size** (lots of overloads).
 
@@ -38,7 +30,7 @@ This implementation **favors performance in detriment of assembly binary size** 
 
 ## Fast enumeration
 
-`NetFabric.Hyperlinq` can enumerate faster the results of a query than `System.Linq` by performing all of the following:
+`Hopeful.Hyperlinq` can enumerate faster the results of a query than `System.Linq` by performing all of the following:
 
 - Merges multiple enumerators into a single one for several more scenarios.
 - It does not box value-type enumerators so, calls to the `Current` property and the `MoveNext()` method are non-virtual.
@@ -56,56 +48,24 @@ The performance is equivalent when the enumerator is a reference-type. This happ
 
 ## Reduced heap allocations
 
-`NetFabric.Hyperlinq` allocates as much as possible on the stack. Enumerables and enumerators are defined as value-types. Generics constraints are used for the operation parameters so that the value-types are not boxed.
+`Hopeful.Hyperlinq` allocates as much as possible on the stack. Enumerables and enumerators are defined as value-types. Generics constraints are used for the operation parameters so that the value-types are not boxed.
 
 It only allocates on the heap for the following cases:
 
 - Operations that use `ICollection<>.CopyTo()`, `ICollection<>.Contains()`, or `IList<>.IndexOf()` will box enumerables that are value-types.   
 - `ToArray()` and `ToList()` allocate their results on the heap. You can use the `ToArray()` overload that take an buffer pool as parameter so that its result is not managed by the garbage collector.
 
-## Benchmarks
-
-The results of the benchmarks comparing multiple LINQ libraries can be found in the [LinqBenchmarks](https://github.com/NetFabric/LinqBenchmarks) repository. 
-
-The results of the benchmarks included in this repository can be found in the [Benchmarks](https://github.com/NetFabric/NetFabric.Hyperlinq/tree/main/Benchmarks) folder. 
-
-The names of the benchmarks are structured as follow:
-
-- The library used:
-  - _Linq_ - the `System.Linq` namespace (includes [System.Linq.Async](https://www.nuget.org/packages/System.Linq.Async/), [System.Interactive](https://www.nuget.org/packages/System.Interactive/), and [System.Interactive.Async](https://www.nuget.org/packages/System.Interactive.Async/))
-  - _StructLinq_ - [StructLinq](https://www.nuget.org/packages/StructLinq/)
-  - _Hyperlinq_ - [NetFabric.Hyperlinq](https://www.nuget.org/packages/NetFabric.Hyperlinq/)
-- The type of collection used as source:
-  - _Array_ - an array
-  - _Span_ - a `Span<>`
-  - _Memory_ - a `Memory<>`
-  - _Enumerable_ - implements `IEnumerable<>`
-  - _Collection_ - implements `IReadOnlyCollection<>` and `ICollection<>`
-  - _List_ - implements `IReadOnlyList<>` and `IList<>` but is not an array
-  - _AsyncEnumerable_ - implements `IAsyncEnumerable<>`
-- The type of enumerator provided by the source:
-  - _Value_ - the enumerator is a value type
-  - _Reference_ - the enumerator is a reference type
-- How the result of the operation is iterated:
-  - _For_ - a `for` loop is used to call the indexer
-  - _Foreach_ - a `foreach` loop is used to call the enumerator
-- Has a variant:
-  - _SIMD_ - using SIMD
-
-
 ## Usage
 
-- Add the [`NetFabric.Hyperlinq` NuGet package](https://www.nuget.org/packages/NetFabric.Hyperlinq/) to your project.
-- Optionally, also add the [`NetFabric.Hyperlinq.Analyzer` NuGet package](https://www.nuget.org/packages/NetFabric.Hyperlinq.Analyzer/) to your project. It's a Roslyn analyzer that suggests performance improvements on your enumeration source code. No dependencies are added to your assemblies.
-- Add an `using NetFabric.Hyperlinq` directive to all source code files where you want to use `NetFabric.Hyperlinq`. It can coexist with `System.Linq` and `System.Linq.Async` directives:
+Add an `using Hopeful.Hyperlinq` directive to all source code files where you want to use `Hopeful.Hyperlinq`. It can coexist with `System.Linq` and `System.Linq.Async` directives:
 
 ``` csharp
 using System;
 using System.Linq;
-using NetFabric.Hyperlinq; // add this directive
+using Hopeful.Hyperlinq; // add this directive
 ```
 
-- Use the methods `AsValueEnumerable()` to make any collection usable with `NetFabric.Hyperlinq`. This includes arrays, `Memory<>`, `ReadOnlyMemory<>`, `Span<>`, `ReadOnlySpan<>`, BCL collections, and any other implementation of `IEnumerable<>`. Use `AsAsyncValueEnumerable()` for any implementation of `IAsyncEnumerable<>`.
+- Use the methods `AsValueEnumerable()` to make any collection usable with `Hopeful.Hyperlinq`. This includes arrays, `Memory<>`, `ReadOnlyMemory<>`, `Span<>`, `ReadOnlySpan<>`, BCL collections, and any other implementation of `IEnumerable<>`. Use `AsAsyncValueEnumerable()` for any implementation of `IAsyncEnumerable<>`.
 
 ``` csharp
 public static void Example(IReadOnlyList<int> list)
@@ -120,11 +80,11 @@ public static void Example(IReadOnlyList<int> list)
 }
 ```
 
-- `Netfabric.Hyperlinq` contains special versions of `AsValueEnumerable()` for better performance with all collections in the `System.Collections.Immutable` namespace. Projects targetting .NET Framework, `netcoreapp2.1` or `netstandard2.0`, require the addition of the [`NetFabric.Hyperlinq.Immutable` NuGet package](https://www.nuget.org/packages/NetFabric.Hyperlinq.Immutable/) dependency.
+- `Hopeful.Hyperlinq` contains special versions of `AsValueEnumerable()` for better performance with all collections in the `System.Collections.Immutable` namespace.
 
-- Most enumerables returned by `NetFabric.Hyperlinq` are compatible with `System.Linq`. The exception is enumerables for `Span<>` or `ReadOnlySpan<>`.
+- Most enumerables returned by `Hopeful.Hyperlinq` are compatible with `System.Linq`. The exception is enumerables for `Span<>` or `ReadOnlySpan<>`.
 
-This allows the use of `System.Linq` operators on `NetFabric.Hyperlinq` enumerables. `OrderByDescending()` is not yet available in `Netfabric.Hyperlinq` but can still be used without requiring any conversion:
+This allows the use of `System.Linq` operators on `Hopeful.Hyperlinq` enumerables. `OrderByDescending()` is not yet available in `Hopeful.Hyperlinq` but can still be used without requiring any conversion:
 
 ``` csharp
 public static void Example(IReadOnlyList<int> list)
@@ -132,7 +92,7 @@ public static void Example(IReadOnlyList<int> list)
   var result = list
     .AsValueEnumerable()
     .Where(item => item > 2)
-    .OrderByDescending(item => item) // is not yet available in Netfabric.Hyperlinq
+    .OrderByDescending(item => item) // is not yet available in Hopeful.Hyperlinq
     .AsValueEnumerable()
     .Select(item => item * 2);
 
@@ -141,11 +101,11 @@ public static void Example(IReadOnlyList<int> list)
 }
 ```
 
-To add `NetFabric.Hyperlinq` operations after a `System.Linq` operation, simply add one more `AsValueEnumerable()` or `AsAsyncValueEnumerable()`.
+To add `Hopeful.Hyperlinq` operations after a `System.Linq` operation, simply add one more `AsValueEnumerable()` or `AsAsyncValueEnumerable()`.
 
 ### Value delegates
 
-Calling a lambda expression for each item of the collection is very expensive. `NetFabric.Hyperlinq` supports an alternative that is not as practical but that has much better performance.
+Calling a lambda expression for each item of the collection is very expensive. `Hopeful.Hyperlinq` supports an alternative that is not as practical but that has much better performance.
 
 - Declare a `struct` that implements `IFunction<>`. Here's two examples of how to implement:
 
@@ -189,7 +149,7 @@ The instances are allocated on the stack and the methods calls are non-virtual.
 
 ### Generation operations
 
-In `NetFabric.Hyperlinq`, the generation operations like `Empty()`, `Range()`, `Repeat()` and `Return()` are static methods implemented in the static class `ValueEnumerable`. To use them, instead of the `System.Linq` equivalents, simply use `ValueEnumerable` instead of `Enumerable`.
+In `Hopeful.Hyperlinq`, the generation operations like `Empty()`, `Range()`, `Repeat()` and `Return()` are static methods implemented in the static class `ValueEnumerable`. To use them, instead of the `System.Linq` equivalents, simply use `ValueEnumerable` instead of `Enumerable`.
 
 ``` csharp
 public static void Example(int count)
@@ -205,9 +165,9 @@ public static void Example(int count)
 
 ### Composition
 
-`NetFabric.Hyperlinq` operations can be composed just like with `System.Linq`. The difference is on how each one optimizes the internals to reduce the number of enumerators required to iterate the values.
+`Hopeful.Hyperlinq` operations can be composed just like with `System.Linq`. The difference is on how each one optimizes the internals to reduce the number of enumerators required to iterate the values.
 
-Both `System.Linq` and `NetFabric.Hyperlinq` optimize the code in the following example so that only one enumerator is used to perform both the `Where()` and the `Select()`:
+Both `System.Linq` and `Hopeful.Hyperlinq` optimize the code in the following example so that only one enumerator is used to perform both the `Where()` and the `Select()`:
 
 ``` csharp
 var result = source.AsValueEnumerable()
@@ -215,7 +175,7 @@ var result = source.AsValueEnumerable()
     .Select(item => item * 2);
 ```
 
-`NetFabric.Hyperlinq` includes many more composition optimizations. In the following code, only one enumerator is used:
+`Hopeful.Hyperlinq` includes many more composition optimizations. In the following code, only one enumerator is used:
 
 ``` csharp
 var result = array.AsValueEnumerable()
@@ -230,7 +190,7 @@ var result = array.AsValueEnumerable()
 
 In `System.Linq`, the aggregation operations like `First()`, `Single()` and `ElementAt()`, throw an exception when the source has no items. Often, empty collections are a valid scenario and exception handling is very slow. `System.Linq` has alternative methods like `FirstOrDefault()`, `SingleOrDefault()` and `ElementAtOrDefault()`, that return the `default` value instead of throwing. This is still an issue when the items are of a value-type, where there's no way to distinguish between an empty collection and a valid item.
 
-In `NetFabric.Hyperlinq`, aggregation operations return an `Option<>` type. This is similar in behavior to the [`Nullable<>`](https://docs.microsoft.com/en-us/dotnet/api/system.nullable-1) but it can contain reference types. 
+In `Hopeful.Hyperlinq`, aggregation operations return an `Option<>` type. This is similar in behavior to the [`Nullable<>`](https://docs.microsoft.com/en-us/dotnet/api/system.nullable-1) but it can contain reference types. 
 
 Here's a small example using `First()`:
 
@@ -277,7 +237,7 @@ source.AsValueEnumerable()
     () => { });
 ```
 
-The `NetFabric.Hyperlinq` operations can be applied to `Option<>`, including `Where()`, `Select()` and `SelectMany()`. These return another `Option<>` with the predicate/selector applied to the value, if it exists.
+The `Hopeful.Hyperlinq` operations can be applied to `Option<>`, including `Where()`, `Select()` and `SelectMany()`. These return another `Option<>` with the predicate/selector applied to the value, if it exists.
 
 ```csharp
 source.AsValueEnumerable()
@@ -294,7 +254,7 @@ source.AsValueEnumerable()
 
 `ToArray()` is frequently used to cache values for a brief period and the use of buffer pools may be useful.
 
-`Netfabric.Hyperlinq` adds an overload that takes a `ArrayPool<>` as a parameter:
+`Hopeful.Hyperlinq` adds an overload that takes a `ArrayPool<>` as a parameter:
 
 ``` csharp
 void Method()
@@ -310,9 +270,9 @@ It returns an instance of a [`IMemoryOwner<>`](https://docs.microsoft.com/en-us/
 
 ### SIMD
 
-`NetFabric.Hyperlinq` uses SIMD implicitly to improve performance of some operations. Many times this can only be done explicitly because it can only be used on a limited number of types and operations on them.
+`Hopeful.Hyperlinq` uses SIMD implicitly to improve performance of some operations. Many times this can only be done explicitly because it can only be used on a limited number of types and operations on them.
 
-In `NetFabric.Hyperlinq`, alternative methods that use SIMD, have the word `Vector` at the end of its name. You'll also find that the operations that require an expression, now require two.
+In `Hopeful.Hyperlinq`, alternative methods that use SIMD, have the word `Vector` at the end of its name. You'll also find that the operations that require an expression, now require two.
 
 ``` csharp
 var result = list
